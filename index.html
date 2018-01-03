@@ -1,4 +1,4 @@
-<html>
+<!--<html>
   <head>
     <title>Page d'acueil A - M - A</title>
   </head>
@@ -6,5 +6,118 @@
     <h2>Page en construction</h2>
     <p>Work in proress - come back in 2 month</p>
   </body>
-</html>
+</html>-->
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+body {
+  background: #fcfcfa;
+  height: 500px;
+  position: relative;
+  width: 960px;
+}
+
+.stroke {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+}
+
+.fill {
+  fill: #fff;
+}
+
+.graticule {
+  fill: none;
+  stroke: #777;
+  stroke-width: .5px;
+  stroke-opacity: .5;
+}
+
+.land {
+  fill: #222;
+}
+
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
+}
+
+</style>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+<script src="https://d3js.org/topojson.v2.min.js"></script>
+<script>
+
+var width = 1600,
+    height = 1000;
+
+var projection = d3.geoNaturalEarth()
+                   .scale(300)
+                   .translate([width / 2, height / 2])
+                   .precision(.1);
+
+var path = d3.geoPath()
+             .projection(projection);
+
+var graticule = d3.geoGraticule();
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+svg.append("defs").append("path")
+    .datum({type: "Sphere"})
+    .attr("id", "sphere")
+    .attr("d", path);
+
+svg.append("use")
+    .attr("class", "stroke")
+    .attr("xlink:href", "#sphere");
+
+svg.append("use")
+    .attr("class", "fill")
+    .attr("xlink:href", "#sphere");
+
+svg.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path);
+
+var data;
+
+d3.csv("https://github.com/Hakkahi/test-web-page/blob/master/data.csv", function(rawData) {
+    data = rawData
+    circles()
+});
+
+function circles(){
+    
+    svg.selectAll(".pin")
+       .data(data).enter()
+       .append("circle", ".pin")
+       .attr("r", 1)
+       .attr("transform", function(d) {
+            return "translate(" + projection([
+                d.longitude,
+                d.latitude
+            ]) + ")"
+        })
+       .attr ("fill", "red")
+}
+
+d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json", function(error, world) {
+  if (error) throw error;
+
+  svg.insert("path", ".graticule")
+     .datum(topojson.feature(world, world.objects.land))
+     .attr("class", "land")
+     .attr("d", path);
+});
+
+</script>
+
 
