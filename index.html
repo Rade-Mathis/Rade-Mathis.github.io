@@ -37,6 +37,17 @@
         stroke-width: .5px;
         }
 
+        @font-face {
+            font-family: 'AquilineTwoRegular';
+            src: url('AquilineTwo-webfont.eot');
+            src: url('AquilineTwo-webfont.eot?#iefix') format('embedded-opentype'),
+                url('AquilineTwo-webfont.woff') format('woff'),
+                url('AquilineTwo-webfont.ttf') format('truetype'),
+                url('AquilineTwo-webfont.svg#AquilineTwoRegular') format('svg');
+            font-weight: normal;
+            font-style: normal;
+        }
+
     </style>
 
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -87,23 +98,45 @@ svg.append("path")
    .attr("d", path);
 
 var data;
-var nb_element;
-var current_element = 0;
 var road;
+var nb_element;
 
 function circles(){
-    svg.selectAll(".pin")
-       .data(data).enter()
-       .append("circle", ".pin")
-       .attr("r", 1)
-       .attr("transform", function(d) {
-            return "translate(" + projection([
-                d.longitude,
-                d.latitude
-            ]) + ")"
-        })
-       .attr ("fill", "red");
+    nb_element = data.length;
+    road = svg.selectAll(".pin")
+              .data(data).enter()
+              .append("circle", ".pin")
+              .attr("r", 1)
+              .attr("transform", function(d) {
+                    return "translate(" + projection([
+                        d.longitude,
+                        d.latitude
+                    ]) + ")"
+                })
+              .attr ("fill", "red")
+              .attr("opacity", 0);
+
+    animation();
+
+    function animation(){
+        console.log("plop");
+        road.transition()
+            .delay(function(d,i){return 10 * i; }) 
+            .duration(250)
+            .attr("opacity", 1)
+            .transition()
+            .delay(function(d,i){return (10 * ((nb_element -1) - i) + 1000);})
+            .attr("opacity", 0)
+            .on("end", function(d, i){
+                if(i == (nb_element - 1)){
+                    animation()
+                }
+                ;});
+    }
+
 }
+
+
 
 d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json", function(error, world) {
   if (error) throw error;
@@ -121,4 +154,3 @@ d3.csv("https://gist.githubusercontent.com/Hakkahi/198a39ea6e58125168c2125be88ae
 });
 
 </script>
-
