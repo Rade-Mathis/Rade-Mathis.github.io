@@ -41,9 +41,9 @@
             font-family: 'AquilineTwoRegular';
             src: url('AquilineTwo-webfont.eot');
             src: url('AquilineTwo-webfont.eot?#iefix') format('embedded-opentype'),
-                url('AquilineTwo-webfont.woff') format('woff'),
-                url('AquilineTwo-webfont.ttf') format('truetype'),
-                url('AquilineTwo-webfont.svg#AquilineTwoRegular') format('svg');
+                 url('AquilineTwo-webfont.woff') format('woff'),
+                 url('AquilineTwo-webfont.ttf') format('truetype'),
+                 url('AquilineTwo-webfont.svg#AquilineTwoRegular') format('svg');
             font-weight: normal;
             font-style: normal;
         }
@@ -63,7 +63,7 @@ var width = 960,
     height = 500;
 
 var projection = d3.geoNaturalEarth()
-                   .scale(200)
+                   .scale(175)
                    .translate([width / 2, height / 2])
                    .precision(.1);
 
@@ -71,9 +71,6 @@ var path = d3.geoPath()
              .projection(projection);
 
 var graticule = d3.geoGraticule();
-
-d3.select("body").transition()
-                 .delay(750);
 
 var svg = d3.select("body").append("svg")
             .attr("width", width)
@@ -100,6 +97,11 @@ svg.append("path")
 var data;
 var road;
 var nb_element;
+var projections = [];
+
+function sqr(a) {
+    return a*a;
+}
 
 function circles(){
     nb_element = data.length;
@@ -108,6 +110,11 @@ function circles(){
               .append("circle", ".pin")
               .attr("r", 1)
               .attr("transform", function(d) {
+
+                    projections.push(projection([
+                        d.longitude,
+                        d.latitude
+                    ]));
                     return "translate(" + projection([
                         d.longitude,
                         d.latitude
@@ -119,14 +126,72 @@ function circles(){
     animation();
 
     function animation(){
-        console.log("plop");
-        road.transition()
+        /*road.transition()
             .delay(function(d,i){return 10 * i; }) 
             .duration(250)
             .attr("opacity", 1)
             .transition()
             .delay(function(d,i){return (10 * ((nb_element -1) - i) + 1000);})
             .attr("opacity", 0)
+            .on("end", function(d, i){
+                if(i == (nb_element - 1)){
+                    animation()
+                }
+                ;});*/
+
+        svg.selectAll("line")
+            .data(projections).enter()
+            .append("line")
+            .attr("x1", function(d, i){
+                return projections[i][0];
+            })
+            .attr("y1", function(d, i){
+                return projections[i][1];
+            })
+            .attr("x2", function(d, i){
+                return projections[i][0];
+            })
+            .attr("y2", function(d, i){
+                return projections[i][1];
+            })
+            .attr("stroke", "blue")
+            .attr("stroke-width", 1)
+            .transition()
+            .delay(function(d,i){return 10 * i;}) 
+            .duration(250)
+            .attr("x2", function(d, i){
+                if(i == (nb_element - 1)){
+                    return projections[i][0];
+                }
+                else{
+                    euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
+                    console.log("euclidian", euclidian)
+                    if(euclidian < 20){
+                        return projections[(i + 1)][0];
+                    }
+                    else{
+                        return projections[i][0];                        
+                    }
+                }
+            })
+            .attr("y2", function(d, i){
+                if(i == (nb_element - 1)){
+                    return projections[i][1];
+                }
+                else{
+                    euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
+                    console.log("euclidian", euclidian)
+                    if(euclidian < 20){
+                        return projections[(i + 1)][1];
+                    }
+                    else{
+                        return projections[i][1];                        
+                    }
+                }
+            })
+            .transition()
+            .delay(function(d,i){return (10 * ((nb_element -1) - i) + 1000);})
+            .remove()
             .on("end", function(d, i){
                 if(i == (nb_element - 1)){
                     animation()
