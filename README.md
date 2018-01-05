@@ -2,7 +2,7 @@
 A faire
 
 ## TODO liste
-- [mathis] faire un menu de seleciton de la projection
+- [x] faire un menu de seleciton de la projection
 - [ ] faire un menu de seleciton du navire
 - [ ] afficher la date pour chaque point
   * [ ] en tooltip sur le point
