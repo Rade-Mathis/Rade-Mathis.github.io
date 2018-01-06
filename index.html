@@ -48,6 +48,12 @@
             font-style: normal;
         }
 
+        #projection-menu {
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        }
+
     </style>
 
     <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -57,7 +63,44 @@
 
 <body></body>   
 
+<!-- ***** MODIF MATHIS ***** -->
+<select id="projections-menu"></select>
+<!-- ***** ***** ****** ***** -->
+
 <script>
+
+/***** MODIF MATHIS *****/
+var options = [
+    { name: "Natural Earth",
+      projection: d3.geoNaturalEarth()
+                   .scale(175)
+                   .translate([width / 2, height / 2])
+                   .precision(.1) },
+    { name: "Aitoff",
+      projection: d3.geoAitoff() }
+] ;
+
+var menu = d3.select ("#projections-menu")
+    .on ("change", change) ;
+
+menu.selectAll ("option")
+    .data (options)
+    .enter ().append ("option")
+    .text (function (d) { return d.name ; }) ;
+
+function change() {
+  clearInterval(interval);
+  update(options[this.selectedIndex]);
+}
+
+function update(option) {
+  svg.selectAll("path").transition()
+      .duration(750)
+      .attrTween("d", projectionTween(projection,
+				      projection = option.projection));
+    projection = "toto" ;
+}
+/***** **** ****** *****/
 
 var width = 960,
     height = 500;
