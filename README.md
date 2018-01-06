@@ -1,6 +1,10 @@
 ## README
-A faire
 
+<aside class="notice">
+Il faut ouvrir ce site avec google chrome ou chromium pour éviter les problèmes d'affichage.
+</aside>
+
+A faire
 ## TODO liste
 - [x] faire un menu de seleciton de la projection
 - [ ] faire un menu de seleciton du navire
