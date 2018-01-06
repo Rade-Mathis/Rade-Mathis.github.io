@@ -55,7 +55,7 @@
     <script src="https://d3js.org/topojson.v2.min.js"></script>
 </head>
 
-<body></body>
+<body></body>   
 
 <script>
 
@@ -95,113 +95,70 @@ svg.append("path")
    .attr("d", path);
 
 var data;
-var road;
 var nb_element;
 var projections = [];
 
+var plane = document.getElementById('plane');
+
 function sqr(a) {
-    return a*a;
+    return a * a;
 }
 
-function circles(){
-    nb_element = data.length;
-    road = svg.selectAll(".pin")
-              .data(data).enter()
-              .append("circle", ".pin")
-              .attr("r", 1)
-              .attr("transform", function(d) {
+function draw(){
 
-                    projections.push(projection([
-                        d.longitude,
-                        d.latitude
-                    ]));
-                    return "translate(" + projection([
-                        d.longitude,
-                        d.latitude
-                    ]) + ")"
-                })
-              .attr ("fill", "red")
-              .attr("opacity", 0);
+    
+    var icon = svg.append("png:image")
+                  .attr("xlink:href", "https://cdn.pixabay.com/photo/2013/07/12/18/06/sailer-152989_960_720.png")
+                  .attr("width", 20)
+                  .attr("height", 20)
+                  .attr("transform", "translate(" + (projections[0][0] - 10) + "," + (projections[0][1] - 10) + ")")
+                  .attr("class", "icon");
 
-    animation();
+    var i = 0;
+    var animation = setInterval(function(){
+        
+        icon.transition()
+            .duration(100)
+            .attr("transform", "translate(" + (projections[i][0] - 10) + "," + (projections[i][1] - 10) + ")");
 
-    function animation(){
-        /*road.transition()
-            .delay(function(d,i){return 10 * i; }) 
-            .duration(250)
-            .attr("opacity", 1)
-            .transition()
-            .delay(function(d,i){return (10 * ((nb_element -1) - i) + 1000);})
-            .attr("opacity", 0)
-            .on("end", function(d, i){
-                if(i == (nb_element - 1)){
-                    animation()
-                }
-                ;});*/
+        if(i < (nb_element - 1)){
+            var euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
+            if(euclidian < 20)
+            {
+                svg.append("line")
+                    .attr("x1", projections[i][0])
+                    .attr("y1", projections[i][1])
+                    .attr("x2", projections[i][0])
+                    .attr("y2", projections[i][1])
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
+                    .transition()
+                    .duration(100)
+                    .attr("x2", function(d){
+                        if(i == (nb_element - 1)){
+                            return projections[i][0];
+                        }
+                        else{
+                            return projections[(i + 1)][0];
+                        }
+                    })
+                    .attr("y2", function(d){
+                        if(i == (nb_element - 1)){
+                            return projections[i][1];
+                        }
+                        else{
+                            return projections[(i + 1)][1];
+                        }
+                    });
+            }
+        }
 
-        svg.selectAll("line")
-            .data(projections).enter()
-            .append("line")
-            .attr("x1", function(d, i){
-                return projections[i][0];
-            })
-            .attr("y1", function(d, i){
-                return projections[i][1];
-            })
-            .attr("x2", function(d, i){
-                return projections[i][0];
-            })
-            .attr("y2", function(d, i){
-                return projections[i][1];
-            })
-            .attr("stroke", "blue")
-            .attr("stroke-width", 1)
-            .transition()
-            .delay(function(d,i){return 10 * i;}) 
-            .duration(250)
-            .attr("x2", function(d, i){
-                if(i == (nb_element - 1)){
-                    return projections[i][0];
-                }
-                else{
-                    euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
-                    console.log("euclidian", euclidian)
-                    if(euclidian < 20){
-                        return projections[(i + 1)][0];
-                    }
-                    else{
-                        return projections[i][0];                        
-                    }
-                }
-            })
-            .attr("y2", function(d, i){
-                if(i == (nb_element - 1)){
-                    return projections[i][1];
-                }
-                else{
-                    euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
-                    console.log("euclidian", euclidian)
-                    if(euclidian < 20){
-                        return projections[(i + 1)][1];
-                    }
-                    else{
-                        return projections[i][1];                        
-                    }
-                }
-            })
-            .transition()
-            .delay(function(d,i){return (10 * ((nb_element -1) - i) + 1000);})
-            .remove()
-            .on("end", function(d, i){
-                if(i == (nb_element - 1)){
-                    animation()
-                }
-                ;});
-    }
-
+        i++;
+        if (i == data.length){
+            clearInterval(animation)
+        }
+    },100);
 }
-
-
 
 d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json", function(error, world) {
   if (error) throw error;
@@ -215,7 +172,10 @@ d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba16920754
 d3.csv("https://gist.githubusercontent.com/Hakkahi/198a39ea6e58125168c2125be88ae02d/raw/2b3fa382eacf2e6bbd60ffea32a65623c3210513/data.csv", function(rawData) {
     data = rawData
     nb_element = data.length
-    circles()
+    for(var i = 0; i < nb_element; i++){
+        projections.push(projection([data[i].longitude, data[i].latitude]));
+    }
+    draw();
 });
 
 </script>
