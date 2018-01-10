@@ -119,7 +119,7 @@ function changeBoat(){
             }
         }
         else{
-            $('<option />', {value: "Empty", text: ""}).appendTo($("#natioselect"));
+            $('<option />', {value: datas[$("#boatselect option:selected").val()].Nationality, text: datas[$("#boatselect option:selected").val()].Nationality}).appendTo($("#natioselect"));
             $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
         }
 
