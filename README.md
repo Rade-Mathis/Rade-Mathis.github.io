@@ -7,7 +7,8 @@ A faire
 ## TODO liste
 
 - [x] faire un menu de seleciton de la projection
-  * [ ] Faire bouger la carte
+  * [x] Faire bouger la carte
+  * [ ] Faire bouger le bateau
   * [ ] smotth transitions
   * [ ] Supprimer la ligne de glissement
 - [ ] faire un menu de seleciton du navire
