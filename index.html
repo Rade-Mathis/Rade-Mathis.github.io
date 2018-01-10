@@ -132,10 +132,12 @@ function update(option) {
 	.attrTween ("d", projectionTween (old_projection, projection)) ;
 
     /* this doesn't work (I think that's because the next part override it): */
-    icon.transition.duration (500)
+    icon.transition ().duration (500)
 	.attr("transform", "translate("
 	      + (projections[nb_element - 1][0] - 10) + ","
 	      + (projections[nb_element - 1][1] - 10) + ")");
+    /*icon.transition ().duration (500)
+	.attrTween ("d", projectionTween (old_projection, projection)) ;*/
 }
 
 function projectionTween(projection0, projection1) {
