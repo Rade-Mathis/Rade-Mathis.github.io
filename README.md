@@ -9,7 +9,7 @@ A faire
 - [x] faire un menu de seleciton de la projection
   * [x] Faire bouger la carte
   * [ ] Faire bouger le bateau
-  * [ ] smotth transitions
+  * [x] smooth transitions
   * [ ] Supprimer la ligne de glissement
 - [ ] faire un menu de seleciton du navire
 - [ ] afficher la date pour chaque point

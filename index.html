@@ -105,7 +105,7 @@ function update(option) {
         projections.push(projection([data[i].longitude, data[i].latitude]));
     }
     _land = svg.select (".land")
-    _lines = svg.selectAll("line").data (projections)
+    _lines = svg.selectAll("line").data (projections).transition (500)
 	.attr ("x1", function (p) { return p[0] ; })
 	.attr ("y1", function (p) { return p[1] ; })
         .attr ("x2", function (p, i) {
@@ -127,7 +127,7 @@ function update(option) {
 	    else
 		return projections[i+1][1] ; }) ;
 
-    svg.selectAll ("path").transition ().duration (100)
+    svg.selectAll ("path").transition ().duration (500)
 	.attrTween ("d", projectionTween (old_projection, projection)) ;
 }
 
