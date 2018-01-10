@@ -63,7 +63,16 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
-<body></body>   
+<body>
+
+    <center><h1>Visualisation des explorations maritimes entre 1750 et 1850</h1></center>
+
+    <div style="
+        position:relative;
+        left:100%;" id="container">
+    </div>
+
+</body>   
 
 <!-- ***** MODIF MATHIS ***** -->
 <select id="projections-menu"></select>
@@ -399,19 +408,19 @@ function getData(){
             }
         }
 
-        var natio = $('<select id="natioselect" onchange="changeNatio();" />');
+        var natio = $('<select id="natioselect" style="margin: 10px;" onchange="changeNatio();" />');
         $('<option />', {value: "All", text: "All nationalities"}).appendTo(natio);
         for(var val in nationality) {
             $('<option />', {value: nationality[val], text: nationality[val]}).appendTo(natio);
         }
-        natio.appendTo('body');
+        natio.appendTo('#container');
 
         var boat = $('<select id="boatselect" onchange="changeBoat();"/>');
         $('<option />', {value: "All", text: "All boats"}).appendTo(boat);
         for(var val in boats) {
             $('<option />', {value: boats[val], text: boats[val]}).appendTo(boat);
         }
-        boat.appendTo('body');
+        boat.appendTo('#container');
 
         draw();
     });
