@@ -92,12 +92,16 @@ menu.selectAll ("option")
     .text (function (d) { return d.name ; }) ;
 
 function change() {
-    //clearInterval(interval);
+
+    for(var i = 0; i < intervals.length; ++i)
+    {
+        clearInterval(intervals[i]);
+    }
     update(this.selectedIndex);
     console.log (this.selectedIndex) ;
 }
 
-function update(option) {
+/*function update(option) {
     old_projection = projection ;
     projection = options[option].projection ;
     nb_element = data.length ;
@@ -131,13 +135,19 @@ function update(option) {
     svg.selectAll ("path").transition ().duration (500)
 	.attrTween ("d", projectionTween (old_projection, projection)) ;
 
-    /* this doesn't work (I think that's because the next part override it): */
+    //this doesn't work (I think that's because the next part override it):
     icon.transition ().duration (500)
 	.attr("transform", "translate("
 	      + (projections[nb_element - 1][0] - 10) + ","
 	      + (projections[nb_element - 1][1] - 10) + ")");
     /*icon.transition ().duration (500)
 	.attrTween ("d", projectionTween (old_projection, projection)) ;*/
+//}
+
+function update(option){
+    projection = options[option].projection;
+    d3.select("svg").remove();
+    draw();
 }
 
 function projectionTween(projection0, projection1) {
@@ -173,13 +183,11 @@ var projection = d3.geoNaturalEarth()
                    .translate([width / 2, height / 2])
                    .precision(.1);
 
-var icon ;
-var path = d3.geoPath()
-             .projection(projection);
-
 var graticule = d3.geoGraticule();
-
-var svg = d3.select("body").append("svg")
+var svg;
+var intervals = [];
+var toStop = [];
+/*var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height);
 
@@ -199,11 +207,12 @@ svg.append("use")
 svg.append("path")
    .datum(graticule)
    .attr("class", "graticule")
-   .attr("d", path);
+   .attr("d", path);*/
 
-var data;
+//var data;
+var datas = [];
 var nb_element;
-var projections = [];
+//var projections = [];
 
 var plane = document.getElementById('plane');
 
@@ -211,10 +220,54 @@ function sqr(a) {
     return a * a;
 }
 
-function draw(){
-
+function drawmap(){
     
-    icon = svg.append("png:image")
+    d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json", function(error, world) {
+        if (error) throw error;
+
+        svg.insert("path", ".graticule")
+            .datum(topojson.feature(world, world.objects.land))
+            .attr("class", "land")
+            .attr("d", path);
+    });
+    
+    var path = d3.geoPath()
+             .projection(projection);
+
+    //var graticule = d3.geoGraticule();
+
+    svg = d3.select("body").append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+    svg.append("defs").append("path")
+                    .datum({type: "Sphere"})
+                    .attr("id", "sphere")
+                    .attr("d", path);
+
+    svg.append("use")
+    .attr("class", "stroke")
+    .attr("xlink:href", "#sphere");
+
+    svg.append("use")
+    .attr("class", "fill")
+    .attr("xlink:href", "#sphere");
+
+    svg.append("path")
+    .datum(graticule)
+    .attr("class", "graticule")
+    .attr("d", path);
+}
+
+function drawship(shipname, data){
+
+    var projections = []
+    for(var i = 0; i < data.Lon3.length; i++){
+            projections.push(projection([data.Lon3[i], data.Lat3[i]]));
+    }
+    var size = projections.length
+
+    var icon = svg.append("png:image")
         .attr("xlink:href",
 	      "https://cdn.pixabay.com/photo/2013/07/12/18/06/sailer-152989_960_720.png")
         .attr("width", 20)
@@ -225,12 +278,11 @@ function draw(){
 
     var i = 0;
     var animation = setInterval(function(){
-        
         icon.transition()
             .duration(100)
             .attr("transform", "translate(" + (projections[i][0] - 10) + "," + (projections[i][1] - 10) + ")");
 
-        if(i < (nb_element - 1)){
+        if(i < (size - 1)){
             var euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
             if(euclidian < 20)
             {
@@ -244,7 +296,7 @@ function draw(){
                     .transition()
                     .duration(100)
                     .attr("x2", function(d){
-                        if(i == (nb_element - 1)){
+                        if(i == (size - 1)){
                             return projections[i][0];
                         }
                         else{
@@ -252,7 +304,7 @@ function draw(){
                         }
                     })
                     .attr("y2", function(d){
-                        if(i == (nb_element - 1)){
+                        if(i == (size - 1)){
                             return projections[i][1];
                         }
                         else{
@@ -263,28 +315,24 @@ function draw(){
         }
 
         i++;
-        if (i == data.length){
+        if (i == size){
             clearInterval(animation)
         }
     },100);
+    
+    intervals.push(animation);
 }
 
-d3.json("https://gist.githubusercontent.com/mbostock/4090846/raw/d534aba169207548a8a3d670c9c2cc719ff05c47/world-110m.json", function(error, world) {
-  if (error) throw error;
+function draw(){
+    d3.json("https://raw.githubusercontent.com/Hakkahi/filesDataviz/master/data.json", function(rawData) {
+        drawmap();
+        datas = rawData
+        for(element in datas){
+            drawship(element, datas[element]);
+        }
+    });
+}
 
-  svg.insert("path", ".graticule")
-     .datum(topojson.feature(world, world.objects.land))
-     .attr("class", "land")
-     .attr("d", path);
-});
-
-d3.csv("https://gist.githubusercontent.com/Hakkahi/198a39ea6e58125168c2125be88ae02d/raw/2b3fa382eacf2e6bbd60ffea32a65623c3210513/data.csv", function(rawData) {
-    data = rawData
-    nb_element = data.length
-    for(var i = 0; i < nb_element; i++){
-        projections.push(projection([data[i].longitude, data[i].latitude]));
-    }
-    draw();
-});
+draw();
 
 </script>
