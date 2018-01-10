@@ -131,7 +131,11 @@ function update(option) {
     svg.selectAll ("path").transition ().duration (500)
 	.attrTween ("d", projectionTween (old_projection, projection)) ;
 
-    //icon.transition.attr (
+    /* this doesn't work (I think that's because the next part override it): */
+    icon.transition.duration (500)
+	.attr("transform", "translate("
+	      + (projections[nb_element - 1][0] - 10) + ","
+	      + (projections[nb_element - 1][1] - 10) + ")");
 }
 
 function projectionTween(projection0, projection1) {
