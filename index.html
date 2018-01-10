@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <head>
+    <title>Chips and bots</title>
     <style>
 
         body {
@@ -129,6 +130,8 @@ function update(option) {
 
     svg.selectAll ("path").transition ().duration (500)
 	.attrTween ("d", projectionTween (old_projection, projection)) ;
+
+    icon.transition.attr (
 }
 
 function projectionTween(projection0, projection1) {
@@ -164,6 +167,7 @@ var projection = d3.geoNaturalEarth()
                    .translate([width / 2, height / 2])
                    .precision(.1);
 
+var icon ;
 var path = d3.geoPath()
              .projection(projection);
 
@@ -204,12 +208,14 @@ function sqr(a) {
 function draw(){
 
     
-    var icon = svg.append("png:image")
-                  .attr("xlink:href", "https://cdn.pixabay.com/photo/2013/07/12/18/06/sailer-152989_960_720.png")
-                  .attr("width", 20)
-                  .attr("height", 20)
-                  .attr("transform", "translate(" + (projections[0][0] - 10) + "," + (projections[0][1] - 10) + ")")
-                  .attr("class", "icon");
+    icon = svg.append("png:image")
+        .attr("xlink:href",
+	      "https://cdn.pixabay.com/photo/2013/07/12/18/06/sailer-152989_960_720.png")
+        .attr("width", 20)
+        .attr("height", 20)
+        .attr("transform", "translate(" + (projections[0][0] - 10) + ","
+	      + (projections[0][1] - 10) + ")")
+        .attr("class", "icon");
 
     var i = 0;
     var animation = setInterval(function(){
