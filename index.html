@@ -60,6 +60,7 @@
     <script src="https://d3js.org/d3.v4.min.js"></script>
     <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
     <script src="https://d3js.org/topojson.v2.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 
 <body></body>   
@@ -93,12 +94,70 @@ menu.selectAll ("option")
 
 function change() {
 
-    for(var i = 0; i < intervals.length; ++i)
-    {
-        clearInterval(intervals[i]);
+    projection = options[this.selectedIndex].projection;
+    update();
+}
+
+function changeBoat(){
+
+
+
+    if($("#boatselect option:selected").val() != "Empty"){
+        natioToDisplay = "All";
+        boatsToDisplay = $("#boatselect option:selected").val();
+        $("#natioselect").empty();
+        if($("#boatselect option:selected").val() == "All"){
+
+            $('<option />', {value: "All", text: "All boats"}).appendTo($("#boatselect"));
+            for(var val in boats) {
+                $('<option />', {value: boats[val], text: boats[val]}).appendTo($("#boatselect"));
+            }
+
+            $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
+            for(var val in nationality) {
+                $('<option />', {value: nationality[val], text: nationality[val]}).appendTo($("#natioselect"));
+            }
+        }
+        else{
+            $('<option />', {value: "Empty", text: ""}).appendTo($("#natioselect"));
+            $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
+        }
+
+        update();
     }
-    update(this.selectedIndex);
-    console.log (this.selectedIndex) ;
+
+}
+
+function changeNatio(){
+    
+    if($("#natioselect option:selected").val() != "Empty"){
+        boatsToDisplay = "All";
+        natioToDisplay = $("#natioselect option:selected").val();
+        $("#boatselect").empty();
+        if($("#natioselect option:selected").val() == "All"){
+
+            $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
+            for(var val in nationality) {
+                $('<option />', {value: nationality[val], text: nationality[val]}).appendTo($("#natioselect"));
+            }
+
+            $('<option />', {value: "All", text: "All boats"}).appendTo($("#boatselect"));
+            for(var val in boats) {
+                $('<option />', {value: boats[val], text: boats[val]}).appendTo($("#boatselect"));
+            }
+        }
+        else{
+
+            for(element in datas){
+                if(datas[element].Nationality == $("#natioselect option:selected").val()){
+                    $('<option />', {value: element, text: element}).appendTo($("#boatselect"));
+                }
+            }
+            $('<option />', {value: "All", text: "All boats"}).appendTo($("#boatselect"));
+        }
+
+        update();
+    }
 }
 
 /*function update(option) {
@@ -144,8 +203,11 @@ function change() {
 	.attrTween ("d", projectionTween (old_projection, projection)) ;*/
 //}
 
-function update(option){
-    projection = options[option].projection;
+function update(){
+    for(var i = 0; i < intervals.length; ++i)
+    {
+        clearInterval(intervals[i]);
+    }
     d3.select("svg").remove();
     draw();
 }
@@ -187,6 +249,8 @@ var graticule = d3.geoGraticule();
 var svg;
 var intervals = [];
 var toStop = [];
+var boatsToDisplay = "All";
+var natioToDisplay = "All";
 /*var svg = d3.select("body").append("svg")
             .attr("width", width)
             .attr("height", height);
@@ -212,6 +276,8 @@ svg.append("path")
 //var data;
 var datas = [];
 var nb_element;
+var boats = [];
+var nationality = [];
 //var projections = [];
 
 var plane = document.getElementById('plane');
@@ -323,16 +389,59 @@ function drawship(shipname, data){
     intervals.push(animation);
 }
 
-function draw(){
+function getData(){
     d3.json("https://raw.githubusercontent.com/Hakkahi/filesDataviz/master/data.json", function(rawData) {
-        drawmap();
-        datas = rawData
+        datas = rawData;
         for(element in datas){
-            drawship(element, datas[element]);
+            boats.push(element);
+            if(! nationality.includes(datas[element].Nationality)){
+                nationality.push(datas[element].Nationality);
+            }
         }
+
+        var natio = $('<select id="natioselect" onchange="changeNatio();" />');
+        $('<option />', {value: "All", text: "All nationalities"}).appendTo(natio);
+        for(var val in nationality) {
+            $('<option />', {value: nationality[val], text: nationality[val]}).appendTo(natio);
+        }
+        natio.appendTo('body');
+
+        var boat = $('<select id="boatselect" onchange="changeBoat();"/>');
+        $('<option />', {value: "All", text: "All boats"}).appendTo(boat);
+        for(var val in boats) {
+            $('<option />', {value: boats[val], text: boats[val]}).appendTo(boat);
+        }
+        boat.appendTo('body');
+
+        draw();
     });
 }
 
-draw();
+function draw(){
+    drawmap();
+
+    console.log(boatsToDisplay)
+
+    for(element in datas){
+        if(boatsToDisplay == "All" && natioToDisplay == "All"){
+            drawship(element, datas[element]);
+        }
+        else{
+            if(boatsToDisplay != "All"){
+                if(element == boatsToDisplay){
+                    drawship(element, datas[element]);
+                }
+            }
+            
+            if(natioToDisplay != "All"){
+                if(datas[element].Nationality == natioToDisplay){
+                    drawship(element, datas[element]);
+                }
+            }
+        }
+    }
+}
+
+getData();
 
 </script>
