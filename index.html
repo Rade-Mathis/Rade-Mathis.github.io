@@ -72,12 +72,14 @@
 /***** MODIF MATHIS *****/
 var options = [
     { name: "Natural Earth",
-      projection: d3.geoNaturalEarth()
+      projection: d3.geoNaturalEarth()/*
                    .scale(175)
                    .translate([width / 2, height / 2])
-                   .precision(.1) },
+                   .precision(.1) */},
     { name: "Aitoff",
-      projection: d3.geoAitoff() }
+      projection: d3.geoAitoff() },
+    { name: "Polyconic",
+      projection: d3.geoPolyconic ().scale (100) }
 ] ;
 
 var menu = d3.select ("#projections-menu")
@@ -89,16 +91,47 @@ menu.selectAll ("option")
     .text (function (d) { return d.name ; }) ;
 
 function change() {
-  clearInterval(interval);
-  update(options[this.selectedIndex]);
+    //clearInterval(interval);
+    update(this.selectedIndex);
+    console.log (this.selectedIndex) ;
 }
 
 function update(option) {
-  svg.selectAll("path").transition()
-      .duration(750)
-      .attrTween("d", projectionTween(projection,
-				      projection = option.projection));
-    projection = "toto" ;
+
+    /*_lines.forEach (function (l) {
+	console.log (l) ;
+    }) ;*/
+	/*.transition()
+	.duration(750)
+	.attrTween("d", projectionTween(projection,
+					projection = option.projection));*/
+    projection = options[option].projection ;
+    nb_element = data.length ;
+    projections = [] ;
+    for(var i = 0; i < nb_element; i++){
+        projections.push(projection([data[i].longitude, data[i].latitude]));
+    }
+    _lines = svg.selectAll("line").data (projections)
+	.attr ("x1", function (p) { return p[0] ; })
+	.attr ("y1", function (p) { return p[1] ; })
+        .attr ("x2", function (p, i) {
+	    var euclidian = Math.sqrt(sqr(projections[(i+1)][1]
+					  - projections[i][1])
+				      + sqr(projections[(i+1)][0]
+					    - projections[i][0]));
+	    if (i == nb_element - 1 || euclidian > 20)
+		return p[0] ;
+	    else
+		return projections[i+1][0] ; })
+    	.attr ("y2", function (p, i) {
+	    var euclidian = Math.sqrt(sqr(projections[(i+1)][1]
+					  - projections[i][1])
+				      + sqr(projections[(i+1)][0]
+					    - projections[i][0]));
+	    if (i == nb_element - 1 || euclidian > 20)
+		return p[1] ;
+	    else
+		return projections[i+1][1] ; }) ;
 }
 /***** **** ****** *****/
 

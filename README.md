@@ -7,6 +7,9 @@ A faire
 ## TODO liste
 
 - [x] faire un menu de seleciton de la projection
+  * [ ] Faire bouger la carte
+  * [ ] smotth transitions
+  * [ ] Supprimer la ligne de glissement
 - [ ] faire un menu de seleciton du navire
 - [ ] afficher la date pour chaque point
   * [ ] en tooltip sur le point
