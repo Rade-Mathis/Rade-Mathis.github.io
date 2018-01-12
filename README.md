@@ -7,12 +7,9 @@ A faire
 ## TODO liste
 
 - [x] faire un menu de seleciton de la projection
-  * [x] Faire bouger la carte
-  * [ ] Faire bouger le bateau
-  * [x] smooth transitions
-  * [ ] Supprimer la ligne de glissement
-- [ ] faire un menu de seleciton du navire
+- [x] faire un menu de seleciton du navire
+  * [x] selection par nationalité
 - [ ] afficher la date pour chaque point
   * [ ] en tooltip sur le point
   * [ ] en 'ATH'
-- [ ] afficher plusieurs bateaux en même temps
+- [x] afficher plusieurs bateaux en même temps
