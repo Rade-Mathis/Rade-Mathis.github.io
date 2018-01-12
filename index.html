@@ -74,19 +74,13 @@
 
 </body>   
 
-<!-- ***** MODIF MATHIS ***** -->
 <select id="projections-menu"></select>
-<!-- ***** ***** ****** ***** -->
 
 <script>
 
-/***** MODIF MATHIS *****/
 var options = [
     { name: "Natural Earth",
-      projection: d3.geoNaturalEarth()/*
-                   .scale(175)
-                   .translate([width / 2, height / 2])
-                   .precision(.1) */},
+      projection: d3.geoNaturalEarth()},
     { name: "Aitoff",
       projection: d3.geoAitoff() },
     { name: "Polyconic",
@@ -117,19 +111,29 @@ function changeBoat(){
         $("#natioselect").empty();
         if($("#boatselect option:selected").val() == "All"){
 
-            $('<option />', {value: "All", text: "All boats"}).appendTo($("#boatselect"));
+            $('<option />', {value: "All", text: "All boats"})
+		.appendTo($("#boatselect"));
             for(var val in boats) {
-                $('<option />', {value: boats[val], text: boats[val]}).appendTo($("#boatselect"));
+                $('<option />', {value: boats[val], text: boats[val]})
+		    .appendTo($("#boatselect"));
             }
 
-            $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
+            $('<option />', {value: "All", text: "All nationalities"})
+		.appendTo($("#natioselect"));
             for(var val in nationality) {
-                $('<option />', {value: nationality[val], text: nationality[val]}).appendTo($("#natioselect"));
+                $('<option />', {value: nationality[val],
+				 text: nationality[val]})
+		    .appendTo($("#natioselect"));
             }
         }
         else{
-            $('<option />', {value: datas[$("#boatselect option:selected").val()].Nationality, text: datas[$("#boatselect option:selected").val()].Nationality}).appendTo($("#natioselect"));
-            $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
+            $('<option />', {value: datas[$("#boatselect option:selected")
+					  .val()]
+			     .Nationality,
+			     text: datas[$("#boatselect option:selected").val()]
+			     .Nationality}).appendTo($("#natioselect"));
+            $('<option />', {value: "All", text: "All nationalities"})
+		.appendTo($("#natioselect"));
         }
 
         update();
@@ -145,30 +149,38 @@ function changeNatio(){
         $("#boatselect").empty();
         if($("#natioselect option:selected").val() == "All"){
 
-            $('<option />', {value: "All", text: "All nationalities"}).appendTo($("#natioselect"));
+            $('<option />', {value: "All", text: "All nationalities"})
+		.appendTo($("#natioselect"));
             for(var val in nationality) {
-                $('<option />', {value: nationality[val], text: nationality[val]}).appendTo($("#natioselect"));
+                $('<option />', {value: nationality[val],
+				 text: nationality[val]})
+		    .appendTo($("#natioselect"));
             }
 
-            $('<option />', {value: "All", text: "All boats"}).appendTo($("#boatselect"));
+            $('<option />', {value: "All", text: "All boats"})
+		.appendTo($("#boatselect"));
             for(var val in boats) {
-                $('<option />', {value: boats[val], text: boats[val]}).appendTo($("#boatselect"));
+                $('<option />', {value: boats[val], text: boats[val]})
+		    .appendTo($("#boatselect"));
             }
         }
         else{
 
             for(element in datas){
                 if(datas[element].Nationality == $("#natioselect option:selected").val()){
-                    $('<option />', {value: element, text: element}).appendTo($("#boatselect"));
+                    $('<option />', {value: element, text: element})
+			.appendTo($("#boatselect"));
                 }
             }
-            $('<option />', {value: "All", text: "All boats"}).appendTo($("#boatselect"));
+            $('<option />', {value: "All", text: "All boats"})
+		.appendTo($("#boatselect"));
         }
 
         update();
     }
 }
 
+/*** Old code for smooth transitions ***/
 /*function update(option) {
     old_projection = projection ;
     projection = options[option].projection ;
@@ -244,7 +256,6 @@ function projectionTween(projection0, projection1) {
     };
   };
 }
-/***** **** ****** *****/
 
 var width = 960,
     height = 500;
@@ -260,34 +271,11 @@ var intervals = [];
 var toStop = [];
 var boatsToDisplay = "All";
 var natioToDisplay = "All";
-/*var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height);
 
-svg.append("defs").append("path")
-                  .datum({type: "Sphere"})
-                  .attr("id", "sphere")
-                  .attr("d", path);
-
-svg.append("use")
-   .attr("class", "stroke")
-   .attr("xlink:href", "#sphere");
-
-svg.append("use")
-   .attr("class", "fill")
-   .attr("xlink:href", "#sphere");
-
-svg.append("path")
-   .datum(graticule)
-   .attr("class", "graticule")
-   .attr("d", path);*/
-
-//var data;
 var datas = [];
 var nb_element;
 var boats = [];
 var nationality = [];
-//var projections = [];
 
 var plane = document.getElementById('plane');
 
@@ -308,8 +296,6 @@ function drawmap(){
     
     var path = d3.geoPath()
              .projection(projection);
-
-    //var graticule = d3.geoGraticule();
 
     svg = d3.select("body").append("svg")
                 .attr("width", width)
@@ -344,8 +330,6 @@ function drawship(shipname, data){
 
     var icon = svg.append("png:image")
         .attr("xlink:href",
-	      //"https://cdn.pixabay.com/photo/2013/07/12/18/06/sailer-152989_960_720.png")
-	      //"https://github.com/Rade-Mathis/Rade-Mathis.github.io/blob/master/sailer.png")
 	      "https://rade-mathis.github.io/sailer.png")
         .attr("width", 20)
         .attr("height", 20)
@@ -357,10 +341,15 @@ function drawship(shipname, data){
     var animation = setInterval(function(){
         icon.transition()
             .duration(100)
-            .attr("transform", "translate(" + (projections[i][0] - 10) + "," + (projections[i][1] - 10) + ")");
+            .attr("transform",
+		  "translate(" + (projections[i][0] - 10) + ","
+		  + (projections[i][1] - 10) + ")");
 
         if(i < (size - 1)){
-            var euclidian = Math.sqrt(sqr(projections[(i+1)][1] - projections[i][1]) + sqr(projections[(i+1)][0] - projections[i][0]));
+            var euclidian = Math.sqrt(sqr(projections[(i+1)][1]
+					  - projections[i][1])
+				      + sqr(projections[(i+1)][0]
+					    - projections[i][0]));
             if(euclidian < 20)
             {
                 svg.append("line")
@@ -411,16 +400,19 @@ function getData(){
         }
 
         var natio = $('<select id="natioselect" style="margin: 10px;" onchange="changeNatio();" />');
-        $('<option />', {value: "All", text: "All nationalities"}).appendTo(natio);
+        $('<option />', {value: "All", text: "All nationalities"})
+	    .appendTo(natio);
         for(var val in nationality) {
-            $('<option />', {value: nationality[val], text: nationality[val]}).appendTo(natio);
+            $('<option />', {value: nationality[val], text: nationality[val]})
+		.appendTo(natio);
         }
         natio.appendTo('#container');
 
         var boat = $('<select id="boatselect" onchange="changeBoat();"/>');
         $('<option />', {value: "All", text: "All boats"}).appendTo(boat);
         for(var val in boats) {
-            $('<option />', {value: boats[val], text: boats[val]}).appendTo(boat);
+            $('<option />', {value: boats[val], text: boats[val]})
+		.appendTo(boat);
         }
         boat.appendTo('#container');
 
