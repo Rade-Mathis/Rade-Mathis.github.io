@@ -326,11 +326,24 @@ function drawship(shipname, data){
     for(var i = 0; i < data.Lon3.length; i++){
             projections.push(projection([data.Lon3[i], data.Lat3[i]]));
     }
-    var size = projections.length
+    var size = projections.length ;
+
+    var nat_color = "black" ;
+    if (data.Nationality === "British") {
+	nat_color = "DarkRed" ;
+    } else if (data.Nationality === "Spanish") {
+	nat_color = "GoldenRod" ;
+    } else if (data.Nationality === "French") {
+	nat_color = "DarkBlue" ;
+    } else if (data.Nationality === "Dutch") {
+	nat_color = "OrangeRed" ;
+    }
+
+    var icon_filename = "sailer_" + nat_color + ".png" ;
 
     var icon = svg.append("png:image")
         .attr("xlink:href",
-	      "https://rade-mathis.github.io/sailer.png")
+	      "https://rade-mathis.github.io/"+icon_filename)
         .attr("width", 20)
         .attr("height", 20)
         .attr("transform", "translate(" + (projections[0][0] - 10) + ","
@@ -357,7 +370,7 @@ function drawship(shipname, data){
                     .attr("y1", projections[i][1])
                     .attr("x2", projections[i][0])
                     .attr("y2", projections[i][1])
-                    .attr("stroke", "black")
+                    .attr("stroke", nat_color)
                     .attr("stroke-width", 1)
                     .transition()
                     .duration(100)
